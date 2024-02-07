@@ -8,6 +8,9 @@ app.get("/", (req, res) => {
 app.get("/adminboard", (req, res) => {
     res.sendFile(path.join(__dirname + "/adminboard.html"));
 })
+app.get("/dashboard", (req, res) => {
+    res.sendFile(path.join(__dirname + "/dashboard.html"));
+})
 const server = app.listen(5000);
 const portNumber = server.address().port;
 console.log(`port is open on ${portNumber}`);

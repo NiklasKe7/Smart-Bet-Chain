@@ -1,10 +1,464 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
 </head>
 <body>
-
-</body>
-</html>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #e9ecef;
+            overflow: hidden; /* Verhindert Scrollbars, wenn nicht nötig */
+        }
+    
+        .container {
+            text-align: center;
+            background: #ffffff;
+            padding: 40px 50px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            max-width: 80%; /* Stellt sicher, dass der Container auf kleinen Bildschirmen gut aussieht */
+        }
+    
+        h1 {
+            color: #495057;
+            margin-bottom: 30px;
+            font-size: 2rem; /* Etwas kleiner für eine bessere Übersicht */
+        }
+    
+        .button-group {
+            display: flex;
+            flex-direction: column; /* Stapelt die Buttons vertikal */
+            align-items: center; /* Zentriert die Buttons horizontal */
+        }
+    
+        .btn {
+            font-size: 1rem;
+            padding: 10px 20px;
+            border-radius: 30px; /* Rundere Buttons */
+            margin: 10px; /* Gleichmäßiger Abstand */
+            width: 200px; /* Gleiche Breite für alle Buttons */
+            transition: all 0.3s ease;
+        }
+    
+        /* Button-Farben und Hover-Effekte bleiben gleich */
+    
+    
+        #addGame {
+            background-color: #28a745;
+            color: #ffffff;
+        }
+    
+        #addGame:hover {
+            background-color: #218838;
+        }
+    
+        #closeBets {
+            background-color: #dc3545;
+            color: #ffffff;
+        }
+    
+        #closeBets:hover {
+            background-color: #c82333;
+        }
+    
+        #addGameWinner {
+            background-color: #ffc107;
+            color: #212529;
+        }
+    
+        #addGameWinner:hover {
+            background-color: #e0a800;
+        }
+    
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+    
+        .btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        .membersList {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            margin-right: 10px;
+            background: #ACD8F0;
+            width: 150px;
+            border: 1px solid #000000;
+            overflow: auto;
+            float: right;
+        }
+    </style>
+    <div class="container">
+        <h1>Wettverwaltung</h1>
+        <div class="button-group">
+            <button onclick="addBet()">ADD BET</button> <br>
+            <button onclick="collectWinnings()">COLLECT WINNINGS</button> <br>
+            <p id="addGameArea"></p>
+            <div id="target">
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+    <script>
+        window.onload = async () => {
+            const ABI = [
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint8",
+                            "name": "_gameId",
+                            "type": "uint8"
+                        },
+                        {
+                            "internalType": "uint8",
+                            "name": "_winPrediction",
+                            "type": "uint8"
+                        }
+                    ],
+                    "name": "addBet",
+                    "outputs": [],
+                    "stateMutability": "payable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "string",
+                            "name": "_name",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "_betAmount",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "addGame",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint8",
+                            "name": "_gameId",
+                            "type": "uint8"
+                        },
+                        {
+                            "internalType": "uint8",
+                            "name": "_winner",
+                            "type": "uint8"
+                        }
+                    ],
+                    "name": "addGameWinner",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint8",
+                            "name": "_gameId",
+                            "type": "uint8"
+                        }
+                    ],
+                    "name": "closeBets",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "_gameId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "collectWinnings",
+                    "outputs": [],
+                    "stateMutability": "payable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "constructor"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "games",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "id",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "uint8",
+                            "name": "winner",
+                            "type": "uint8"
+                        },
+                        {
+                            "internalType": "bool",
+                            "name": "isOver",
+                            "type": "bool"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "betAmount",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "counterTeamOne",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "counterTeamTwo",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "counterDraw",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "betCount",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "gameId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "bettorAdress",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "getBet",
+                    "outputs": [
+                        {
+                            "components": [
+                                {
+                                    "internalType": "address",
+                                    "name": "user",
+                                    "type": "address"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "gameId",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "uint8",
+                                    "name": "winPrediction",
+                                    "type": "uint8"
+                                }
+                            ],
+                            "internalType": "struct BetContract.Bet",
+                            "name": "",
+                            "type": "tuple"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "gameId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "getBetCount",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "_id",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "getGame",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "uint8",
+                            "name": "",
+                            "type": "uint8"
+                        },
+                        {
+                            "internalType": "bool",
+                            "name": "",
+                            "type": "bool"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "getGamesCount",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "owner",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                }
+            ];
+            const Address = "0x85235b5688c51f1145037bcd3bfa796767C2F001";
+            window.web3 = await new Web3(window.ethereum);
+            window.contract = await new window.web3.eth.Contract( ABI, Address);
+    
+    
+    
+    
+            const gamesCount = await window.contract.methods.getGamesCount().call();
+                if (gamesCount == 0){
+    
+                    document.getElementById('membersList').style.display = 'none'; // Versteckt den "Add Game Winner" Button
+                } else {
+                    var gamesList = [];
+                    for (i=0; i<gamesCount;i++){
+                        gamesList.push(await window.contract.methods.getGame(i).call());
+    
+                    }
+                    console.log(gamesList);
+    
+                    const newTable = document.createElement("table");
+                    newTable.innerHTML = "<thead><th>ID</th><th>Name</th><th>Winner</th><th>BettingOver</th><th>BetCount</th></thead>";
+                    for(game of gamesList){
+                        const newRow = document.createElement("tr");
+    
+                        const tdId = document.createElement("td");
+                        const tdName = document.createElement("td");
+                        const tdWinner = document.createElement("td");
+                        const tdIsOver = document.createElement("td");
+                        const tdBetCount = document.createElement("td");
+    
+                        tdId.textContent = game[0];
+                        tdName.textContent = game[1];
+                        tdWinner.textContent = game[2];
+                        tdIsOver.textContent = game[3];
+                        tdBetCount.textContent = game[7];
+                        
+                        newRow.appendChild(tdId);
+                        newRow.appendChild(tdName);
+                        newRow.appendChild(tdWinner);
+                        newRow.appendChild(tdIsOver);
+                        newRow.appendChild(tdBetCount);
+    
+                        newTable.appendChild(newRow);
+                    }
+    
+                    const target = document.getElementById('target');
+                    target.appendChild(newTable);
+                }
+        }
+        
+        const addBet = async () => {
+            const idOfGame = prompt('Nenne die ID des Spiels', '0');
+            const winPrediction = prompt('Wette aufs Ergebnis: 1 = Heimteam gewinnt, 2 = Auswärtsteam gewinnt, 3 = Unentschieden:', '0');
+            await window.contract.methods.addBet(idOfGame, winPrediction).send({from:sessionStorage.getItem("account")});
+    
+        }
+    
+        const collectWinnings = async () => {
+            const idOfGame = prompt('Nenne die ID des Spiels', '0');
+            return window.contract.methods.collectWinnings(idOfGame).send({from:sessionStorage.getItem("account")});
+        }
+    </script>
+    </body>
+    </html>

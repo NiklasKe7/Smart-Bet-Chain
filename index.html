@@ -317,7 +317,7 @@
                 "type": "function"
             }
         ];
-        const address = "0x1a2e54796d9C5C91Bfa25c76FE8Cda5Dcdf47916";
+        const address = "0x85235b5688c51f1145037bcd3bfa796767C2F001";
         window.web3 = await new Web3(window.ethereum);
         window.contract = await new window.web3.eth.Contract( ABI, address);
         document.getElementById("contractArea").innerHTML = "connected to smart contract";
@@ -336,8 +336,11 @@
         sessionStorage.setItem("account", account);
         if (owner.toUpperCase() == account.toUpperCase()){
             window.location.href = "/adminboard";
-
+        } 
+        else {
+            window.location.href = "/dashboard";
         }
+        
     }
 
     //3-read data from smart contract
