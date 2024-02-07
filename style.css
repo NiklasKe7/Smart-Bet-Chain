@@ -1,0 +1,80 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #e9ecef;
+    overflow: hidden; /* Verhindert Scrollbars, wenn nicht nötig */
+}
+
+.container {
+    text-align: center;
+    background: #ffffff;
+    padding: 40px 50px;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    max-width: 80%; /* Stellt sicher, dass der Container auf kleinen Bildschirmen gut aussieht */
+}
+
+h1 {
+    color: #495057;
+    margin-bottom: 30px;
+    font-size: 2rem; /* Etwas kleiner für eine bessere Übersicht */
+}
+
+.button-group {
+    display: flex;
+    flex-direction: column; /* Stapelt die Buttons vertikal */
+    align-items: center; /* Zentriert die Buttons horizontal */
+}
+
+.btn {
+    font-size: 1rem;
+    padding: 10px 20px;
+    border-radius: 30px; /* Rundere Buttons */
+    margin: 10px; /* Gleichmäßiger Abstand */
+    width: 200px; /* Gleiche Breite für alle Buttons */
+    transition: all 0.3s ease;
+}
+
+/* Button-Farben und Hover-Effekte bleiben gleich */
+
+
+#addGame {
+    background-color: #28a745;
+    color: #ffffff;
+}
+
+#addGame:hover {
+    background-color: #218838;
+}
+
+#closeBets {
+    background-color: #dc3545;
+    color: #ffffff;
+}
+
+#closeBets:hover {
+    background-color: #c82333;
+}
+
+#addGameWinner {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+#addGameWinner:hover {
+    background-color: #e0a800;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.btn:active {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}

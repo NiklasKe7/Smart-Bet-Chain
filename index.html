@@ -20,15 +20,308 @@
     </style>
 </head>
 <body>
-<button onclick="connectMetamask()">CONNECT TO METAMASK</button> <br>
-<p id="accountArea"></p>
 <button onclick="connectContract()">CONNECT TO CONTRACT</button> <br>
 <p id="contractArea"></p>
+<button onclick="connectMetamask()">CONNECT TO METAMASK</button> <br>
+<p id="accountArea"></p>
 <button onclick="readContract()">GET DATA FROM CONTRACT</button> <br>
 <p id="dataArea"></p>
 
 
 <script>
+    //2- connect to smart contract
+    const connectContract = async () => {
+        const ABI = [
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint8",
+                        "name": "_gameId",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "_winPrediction",
+                        "type": "uint8"
+                    }
+                ],
+                "name": "addBet",
+                "outputs": [],
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "_name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "_betAmount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "addGame",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint8",
+                        "name": "_gameId",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "_winner",
+                        "type": "uint8"
+                    }
+                ],
+                "name": "addGameWinner",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint8",
+                        "name": "_gameId",
+                        "type": "uint8"
+                    }
+                ],
+                "name": "closeBets",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "_gameId",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "collectWinnings",
+                "outputs": [],
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "games",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "id",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "winner",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isOver",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "betAmount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "counterTeamOne",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "counterTeamTwo",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "counterDraw",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "betCount",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "gameId",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "bettorAdress",
+                        "type": "address"
+                    }
+                ],
+                "name": "getBet",
+                "outputs": [
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "user",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "gameId",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "winPrediction",
+                                "type": "uint8"
+                            }
+                        ],
+                        "internalType": "struct BetContract.Bet",
+                        "name": "",
+                        "type": "tuple"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "gameId",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "getBetCount",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "_id",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "getGame",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getGamesCount",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "owner",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
+        const Address = "0x54F5Ce610b15743614BEa7A9359BBF6122347518";
+        window.web3 = await new Web3(window.ethereum);
+        window.contract = await new window.web3.eth.Contract( ABI, Address);
+        document.getElementById("contractArea").innerHTML = "connected to smart contract";
+    }
     //1- connect metamask
     let account;
     const connectMetamask = async () => {
@@ -37,34 +330,16 @@
             account = accounts[0];
             document.getElementById("accountArea").innerHTML = account;
         }
-    }
+        const owner = await window.contract.methods.owner().call();
 
-    //2- connect to smart contract
-    const connectContract = async () => {
-        const ABI = [
-            {
-                "inputs": [],
-                "name": "myCity",
-                "outputs": [
-                    {
-                        "internalType": "string",
-                        "name": "",
-                        "type": "string"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            }
-        ];
-        const Address = "0x36D32f98040162b92516C9998FBCDCA7C5659Fc7";
-        window.web3 = await new Web3(window.ethereum);
-        window.contract = await new window.web3.eth.Contract( ABI, Address);
-        document.getElementById("contractArea").innerHTML = "connected to smart contract";
+        if (owner.toUpperCase() == account.toUpperCase()){
+            window.location.href = "/adminboard";
+        }
     }
 
     //3-read data from smart contract
     const readContract = async () => {
-        const data = await window.contract.methods.myCity().call();
+        const data = await window.contract.methods.owner().call();
         document.getElementById("dataArea").innerHTML = data;
     }
 </script>
