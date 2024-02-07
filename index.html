@@ -317,10 +317,11 @@
                 "type": "function"
             }
         ];
-        const Address = "0x54F5Ce610b15743614BEa7A9359BBF6122347518";
+        const address = "0x1a2e54796d9C5C91Bfa25c76FE8Cda5Dcdf47916";
         window.web3 = await new Web3(window.ethereum);
-        window.contract = await new window.web3.eth.Contract( ABI, Address);
+        window.contract = await new window.web3.eth.Contract( ABI, address);
         document.getElementById("contractArea").innerHTML = "connected to smart contract";
+        sessionStorage.setItem("address", address);
     }
     //1- connect metamask
     let account;
@@ -332,8 +333,10 @@
         }
         const owner = await window.contract.methods.owner().call();
 
+        sessionStorage.setItem("account", account);
         if (owner.toUpperCase() == account.toUpperCase()){
             window.location.href = "/adminboard";
+
         }
     }
 

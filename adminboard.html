@@ -87,29 +87,359 @@
         transform: translateY(-1px);
         box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     }
+    .membersList {
+        text-align: center;
+        padding: 10px;
+        margin-bottom: 10px;
+        margin-right: 10px;
+        background: #ACD8F0;
+        width: 150px;
+        border: 1px solid #000000;
+        overflow: auto;
+        float: right;
+    }
 </style>
 <div class="container">
     <h1>Spielverwaltung</h1>
     <div class="button-group">
-        <button id="addGame" class="btn">Add Game</button>
-        <button id="closeBets" class="btn">Close Bets</button>
-        <button id="addGameWinner" class="btn">Add Game Winner</button>
+        <button onclick="addGame()">ADD GAME</button> <br>
+        <p id="addGameArea"></p>
+        <div id="target">
+        </div>
     </div>
 </div>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
 <script>
-    document.getElementById('addGame').addEventListener('click', function() {
-        alert('Spiel hinzufügen wurde geklickt');
-    });
+    window.onload = async () => {
+        const ABI = [
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint8",
+                        "name": "_gameId",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "_winPrediction",
+                        "type": "uint8"
+                    }
+                ],
+                "name": "addBet",
+                "outputs": [],
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "_name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "_betAmount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "addGame",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint8",
+                        "name": "_gameId",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "_winner",
+                        "type": "uint8"
+                    }
+                ],
+                "name": "addGameWinner",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint8",
+                        "name": "_gameId",
+                        "type": "uint8"
+                    }
+                ],
+                "name": "closeBets",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "_gameId",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "collectWinnings",
+                "outputs": [],
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "games",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "id",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "winner",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isOver",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "betAmount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "counterTeamOne",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "counterTeamTwo",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "counterDraw",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "betCount",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "gameId",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "bettorAdress",
+                        "type": "address"
+                    }
+                ],
+                "name": "getBet",
+                "outputs": [
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "user",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "gameId",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "winPrediction",
+                                "type": "uint8"
+                            }
+                        ],
+                        "internalType": "struct BetContract.Bet",
+                        "name": "",
+                        "type": "tuple"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "gameId",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "getBetCount",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "_id",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "getGame",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getGamesCount",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "owner",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
+        const Address = "0x1a2e54796d9C5C91Bfa25c76FE8Cda5Dcdf47916";
+        window.web3 = await new Web3(window.ethereum);
+        window.contract = await new window.web3.eth.Contract( ABI, Address);
 
-    document.getElementById('closeBets').addEventListener('click', function() {
-        alert('Wetten schließen wurde geklickt');
-    });
 
-    document.getElementById('addGameWinner').addEventListener('click', function() {
-        alert('Spielgewinner hinzufügen wurde geklickt');
-    });
 
+
+        const gamesCount = await window.contract.methods.getGamesCount().call();
+            if (gamesCount == 0){
+
+                document.getElementById('membersList').style.display = 'none'; // Versteckt den "Add Game Winner" Button
+            } else {
+                var gamesList = [];
+                for (i=0; i<gamesCount;i++){
+                    gamesList.push(await window.contract.methods.getGame(i).call());
+
+                }
+                console.log(gamesList);
+                const newTable = document.createElement("table");
+                newTable.innerHTML = "<thead><th>Name</th><th>Score</th></thead>";
+                for(game of gamesList){
+                    const newRow = document.createElement("tr");
+                    const tdName = document.createElement("td");
+                    var tdCloseBet = document.createElement("td");
+                    tdName.textContent = game[1];
+                    newRow.appendChild(tdName);
+                    newRow.appendChild(tdCloseBet);
+                    newTable.appendChild(newRow);
+                }
+
+                const target = document.getElementById('target');
+                target.appendChild(newTable);
+            }
+    }
+    const closeBets = (key) => {
+        return window.contract.methods.closeBets(key).send({from:sessionStorage.getItem("account")});
+    }
+    const addGame = async () => {
+        const nameOfGame = prompt('Nenne den Namen des Spiels', 'Name');
+        const betAmount = prompt('Nenne den Wetteinsatz in ETH', '0.5');
+        await window.contract.methods.addGame(nameOfGame, betAmount).send({from:sessionStorage.getItem("account")});
+
+    }
 </script>
 </body>
 </html>
